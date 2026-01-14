@@ -263,10 +263,6 @@ def initialize_app():
     traffic_monitor.start_monitoring()
     logger.info("Traffic monitoring started")
 
-# Initialize when running with gunicorn (not during import)
-if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('FLASK_ENV') == 'production':
-    initialize_app()
-
 if __name__ == '__main__':
     # Initialize app for development
     initialize_app()
