@@ -136,6 +136,19 @@ class TrafficMonitor:
             db.session.commit()
             logger.debug(f"Trip {trip.id}: optimal departure in {optimal_departure - now}")
 
-# Global instance
-traffic_monitor = TrafficMonitor()
+# Global instance (lazy-loaded)
+_traffic_monitor_instance = None
+
+def get_traffic_monitor():
+    """Get or create the global traffic monitor instance"""
+    global _traffic_monitor_instance
+    if _traffic_monitor_instance is None:
+        _traffic_monitor_instance = TrafficMonitor()
+    return _traffic_monitor_instance
+
+# For backwards compatibility
+traffic_monitor = type('LazyTrafficMonitor', (), {
+    'start_monitoring': lambda: get_traffic_monitor().start_monitoring(),
+    'stop_monitoring': lambda: get_traffic_monitor().stop_monitoring()
+})()
 
