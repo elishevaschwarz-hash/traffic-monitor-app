@@ -32,8 +32,15 @@ app.config.from_object(Config)
 # Initialize database
 db.init_app(app)
 
-# Initialize Google Maps client
-maps_client = GoogleMapsClient()
+# Initialize Google Maps client (lazy)
+_maps_client = None
+
+def get_maps_client():
+    """Get or create the Google Maps client"""
+    global _maps_client
+    if _maps_client is None:
+        _maps_client = GoogleMapsClient()
+    return _maps_client
 
 # Track if app is initialized
 _app_initialized = False
@@ -128,7 +135,7 @@ def handle_create_trip(user, parsed):
     if not origin:
         return "❌ לא הגדרת כתובת בית!\nשלחי הודעה כמו:\n'הבית שלי זה [כתובת]'"
     
-    travel_info = maps_client.get_directions(origin, destination)
+    travel_info = get_maps_client().get_directions(origin, destination)
     if not travel_info:
         return "❌ לא הצלחתי למצוא מסלול ליעד. בדקי את הכתובת."
     
