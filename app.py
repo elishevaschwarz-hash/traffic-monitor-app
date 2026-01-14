@@ -255,18 +255,24 @@ def start_ngrok():
 
 def initialize_app():
     """Initialize database and monitoring - called after app is fully loaded"""
-    with app.app_context():
-        init_db(app)
-        logger.info("Database initialized")
+    try:
+        with app.app_context():
+            init_db(app)
+            logger.info("Database initialized")
 
-    # Start traffic monitoring
-    traffic_monitor.start_monitoring()
-    logger.info("Traffic monitoring started")
+        # Start traffic monitoring
+        traffic_monitor.start_monitoring()
+        logger.info("Traffic monitoring started")
+    except Exception as e:
+        logger.error(f"Failed to initialize app: {str(e)}", exc_info=True)
+        raise
 
-if __name__ == '__main__':
-    # Initialize app for development
+# Initialize app immediately when module is loaded (works with gunicorn --preload)
+# Skip if running tests or if already initialized
+if not os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
     initialize_app()
 
+if __name__ == '__main__':
     # Start Ngrok only in development
     ngrok_url = start_ngrok()
 
