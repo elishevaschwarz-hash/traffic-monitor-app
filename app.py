@@ -231,38 +231,46 @@ def start_ngrok():
     """Start Ngrok tunnel if enabled"""
     if not Config.USE_NGROK:
         return None
-    
+
     try:
         from pyngrok import ngrok
         import os
-        
+
         # Set authtoken if provided in environment
         ngrok_authtoken = os.getenv('NGROK_AUTHTOKEN')
         if ngrok_authtoken:
             ngrok.set_auth_token(ngrok_authtoken)
-        
+
         # Start tunnel
         tunnel = ngrok.connect(5000)
         ngrok_url = tunnel.public_url
-        
+
         logger.info(f"Ngrok tunnel started: {ngrok_url}")
         logger.info(f"Set Twilio webhook to: {ngrok_url}/webhook/whatsapp")
-        
+
         return ngrok_url
     except Exception as e:
         logger.error(f"Failed to start Ngrok: {str(e)}")
         return None
 
-# Initialize database and monitoring when app starts (for both dev and production)
-with app.app_context():
-    init_db(app)
-    logger.info("Database initialized")
+def initialize_app():
+    """Initialize database and monitoring - called after app is fully loaded"""
+    with app.app_context():
+        init_db(app)
+        logger.info("Database initialized")
 
-# Start traffic monitoring
-traffic_monitor.start_monitoring()
-logger.info("Traffic monitoring started")
+    # Start traffic monitoring
+    traffic_monitor.start_monitoring()
+    logger.info("Traffic monitoring started")
+
+# Initialize when running with gunicorn (not during import)
+if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('FLASK_ENV') == 'production':
+    initialize_app()
 
 if __name__ == '__main__':
+    # Initialize app for development
+    initialize_app()
+
     # Start Ngrok only in development
     ngrok_url = start_ngrok()
 
