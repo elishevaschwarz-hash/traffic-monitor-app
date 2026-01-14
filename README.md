@@ -92,3 +92,7 @@ curl http://localhost:5000/health
 
 הלוגים נשמרים בקובץ `traffic_monitor.log`
 
+## Deployment
+
+האפליקציה מוכנה ל-deployment ב-Railway או פלטפורמות דומות.
+
