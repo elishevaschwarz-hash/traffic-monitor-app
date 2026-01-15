@@ -39,7 +39,19 @@ def get_maps_client():
     """Get or create the Google Maps client"""
     global _maps_client
     if _maps_client is None:
-        _maps_client = GoogleMapsClient()
+        try:
+            # Debug: check if API key is available
+            from config import Config
+            api_key = Config.GOOGLE_MAPS_API_KEY
+            if not api_key:
+                logger.error("GOOGLE_MAPS_API_KEY is None or empty!")
+                logger.error(f"All config vars: {dir(Config)}")
+            else:
+                logger.info(f"GOOGLE_MAPS_API_KEY found: {api_key[:10]}...")
+            _maps_client = GoogleMapsClient()
+        except Exception as e:
+            logger.error(f"Failed to create GoogleMapsClient: {str(e)}", exc_info=True)
+            raise
     return _maps_client
 
 # Track if app is initialized
