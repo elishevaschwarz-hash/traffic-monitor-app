@@ -1,12 +1,15 @@
 import os
 from dotenv import load_dotenv
-import logging
 
 load_dotenv()
 
-# Debug logging for environment variables
-logger = logging.getLogger(__name__)
-logger.info(f"Loading config - GOOGLE_MAPS_API_KEY present: {bool(os.getenv('GOOGLE_MAPS_API_KEY'))}")
+# Debug: Print environment variable status (will appear in Railway logs)
+print(f"[CONFIG DEBUG] GOOGLE_MAPS_API_KEY present: {bool(os.getenv('GOOGLE_MAPS_API_KEY'))}")
+if os.getenv('GOOGLE_MAPS_API_KEY'):
+    print(f"[CONFIG DEBUG] API key starts with: {os.getenv('GOOGLE_MAPS_API_KEY')[:15]}...")
+else:
+    print("[CONFIG DEBUG] GOOGLE_MAPS_API_KEY is None or empty!")
+    print(f"[CONFIG DEBUG] All environment variables: {list(os.environ.keys())}")
 
 class Config:
     # Flask
