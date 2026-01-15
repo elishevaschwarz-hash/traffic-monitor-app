@@ -1,7 +1,12 @@
 import os
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
+
+# Debug logging for environment variables
+logger = logging.getLogger(__name__)
+logger.info(f"Loading config - GOOGLE_MAPS_API_KEY present: {bool(os.getenv('GOOGLE_MAPS_API_KEY'))}")
 
 class Config:
     # Flask
